@@ -1,0 +1,187 @@
+﻿@{
+    ViewData["Title"] = "Calculator";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body {
+            background-color: silver;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1E1E1E;
+            margin-top: 30px;
+            font-size: 36px;
+        }
+
+        .calculator {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #1E1E1E;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border: 1px solid #ccc;
+        }
+
+        .display {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: right;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+            .buttons button {
+                font-size: 20px;
+                padding: 20px;
+                background-color: #2D2D30;
+                color: white;
+                border: 1px solid #3E3E42;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+                .buttons button.double {
+                    grid-column: span 2;
+                }
+    </style>
+</head>
+<body>
+    <h1>Web Calculator</h1>
+    <div class="calculator">
+        <input id="display" class="display" readonly value="0" />
+        <div class="buttons">
+            <button type="button" onclick="clearDisplay()">C</button>
+            <button type="button" onclick="negate()">±</button>
+            <button type="button" onclick="percent()">%</button>
+            <button type="button" onclick="setOperation('÷')">÷</button>
+
+            <button type="button" onclick="appendNumber('7')">7</button>
+            <button type="button" onclick="appendNumber('8')">8</button>
+            <button type="button" onclick="appendNumber('9')">9</button>
+            <button type="button" onclick="setOperation('×')">×</button>
+
+            <button type="button" onclick="appendNumber('4')">4</button>
+            <button type="button" onclick="appendNumber('5')">5</button>
+            <button type="button" onclick="appendNumber('6')">6</button>
+            <button type="button" onclick="setOperation('−')">−</button>
+
+            <button type="button" onclick="appendNumber('1')">1</button>
+            <button type="button" onclick="appendNumber('2')">2</button>
+            <button type="button" onclick="appendNumber('3')">3</button>
+            <button type="button" onclick="setOperation('+')">+</button>
+
+            <button type="button" class="double" onclick="appendNumber('0')">0</button>
+            <button type="button" onclick="appendDecimal()">.</button>
+            <button type="button" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentValue = '';
+        let storedValue = '';
+        let operator = '';
+        let isNewEntry = true;
+
+        function appendNumber(number) {
+            if (isNewEntry) {
+                display.value = '';
+                isNewEntry = false;
+            }
+            display.value += number;
+        }
+
+        function appendDecimal() {
+            if (!display.value.includes('.')) {
+                display.value += '.';
+                isNewEntry = false;
+            }
+        }
+
+        function setOperation(symbol) {
+            storedValue = display.value;
+            operator = symbol;
+            isNewEntry = true;
+        }
+
+        function clearDisplay() {
+            display.value = '0';
+            storedValue = '';
+            operator = '';
+            isNewEntry = true;
+        }
+
+        function negate() {
+            display.value = (parseFloat(display.value) * -1).toString();
+        }
+
+        function percent() {
+            display.value = (parseFloat(display.value) / 100).toString();
+        }
+
+        function calculate() {
+            let result = 0;
+            const left = parseFloat(storedValue);
+            const right = parseFloat(display.value);
+            switch (operator) {
+                case '+': result = left + right; break;
+                case '−': result = left - right; break;
+                case '×': result = left * right; break;
+                case '÷': result = right !== 0 ? left / right : 'Error'; break;
+                default: result = display.value;
+            }
+            display.value = result;
+            isNewEntry = true;
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function (e) {
+            const key = e.key;
+
+            if (!isNaN(key)) {
+                appendNumber(key);
+            } else if (key === '.') {
+                appendDecimal();
+            } else if (key === '+' || key === '-') {
+                setOperation(key === '+' ? '+' : '−');
+            } else if (key === '*' || key.toLowerCase() === 'x') {
+                setOperation('×');
+            } else if (key === '/') {
+                setOperation('÷');
+            } else if (key === 'Enter' || key === '=') {
+                calculate();
+            } else if (key === 'Escape' || key.toLowerCase() === 'c') {
+                clearDisplay();
+            } else if (key === '%') {
+                percent();
+            } else if (key.toLowerCase() === 'n') {
+                negate();
+            }
+        });
+    </script>
+</body>
+</html>
